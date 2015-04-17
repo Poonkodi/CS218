@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 
+=======
+>>>>>>> 5313ca981288e13e54033498ec0040d3895d3c6d
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -14,6 +17,10 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
+<<<<<<< HEAD
+=======
+import org.apache.hadoop.util.StringUtils;
+>>>>>>> 5313ca981288e13e54033498ec0040d3895d3c6d
 
 /* In order to do multiple iterations, 
  * The Map input should be the same as the Reduce output.
@@ -50,9 +57,13 @@ public class PageRankIterations {
 
 			String myurl=items.get(1);
 
+<<<<<<< HEAD
 			//String outlinks = StringUtils.join("\t", items.subList(1, items.size()));
 			String v = values.toString(); 
 			String outlinks = v.substring(v.indexOf('\t')+1);
+=======
+			String outlinks = StringUtils.join("\t", items.subList(1, items.size()));
+>>>>>>> 5313ca981288e13e54033498ec0040d3895d3c6d
 			context.write(new Text(myurl), new Text("LINKS\t"+ outlinks) );
 
 			int num_outlinks = items.size() - 2;
@@ -96,7 +107,10 @@ public class PageRankIterations {
 		Job job = new Job(conf, "pagerank");
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(Text.class);
+<<<<<<< HEAD
 		job.setJarByClass(PageRankIterations.class);
+=======
+>>>>>>> 5313ca981288e13e54033498ec0040d3895d3c6d
 		job.setMapperClass(Map.class);
 		job.setReducerClass(Reduce.class);
 		job.setInputFormatClass(TextInputFormat.class);
