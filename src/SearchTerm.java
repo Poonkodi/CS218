@@ -63,7 +63,7 @@ public class SearchTerm {
 		Map<Double, ArrayList<String>> doc_map = new TreeMap<Double, ArrayList<String>>();
 
 		for (String url : input_docs) {
-			double pr = pagerank_map.containsKey(url) ? pagerank_map.get(url)
+			double pr = pagerank_map.containsKey(url) ? -1.0 * pagerank_map.get(url)
 					: 0.0;
 			if (doc_map.containsKey(pr)) {
 				doc_map.get(pr).add(url);
