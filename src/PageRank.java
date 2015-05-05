@@ -1,10 +1,8 @@
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.StringTokenizer;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
@@ -28,7 +26,7 @@ public class PageRank {
 		public void map(LongWritable key, Text values, Context context) 
 				throws IOException, InterruptedException {
 
-			 String[] result = values.toString().split("\\s");
+			 String[] result = values.toString().split("\t");
 			 for (int x=0; x < result.length ; x++)
 			      System.out.println(result[x]);
 			
@@ -74,9 +72,7 @@ public class PageRank {
 				 for (int x=0; x < result.length ; x++) {
 				      System.out.println("Reducer Args : " + result[x]);
 				 }
-				
-				
-				
+							
 				if (result.length != 2) continue;
 
 				System.out.println("tag:" + result[0]);
@@ -88,8 +84,10 @@ public class PageRank {
 					page_sum += score;
 				}
 			}
-			String out_key = page_sum + "";
-			
+			String out_key = page_sum + " ";
+			if (link_str.isEmpty()) {
+				link_str = key.toString();
+			}
 			System.out.println("ReducerOutput: k:"+ out_key + " ; v:" + link_str);
 			
 			context.write(new Text(out_key) , new Text(link_str));
