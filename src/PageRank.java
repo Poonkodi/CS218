@@ -1,6 +1,5 @@
 import java.io.IOException;
 import java.util.Iterator;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
@@ -15,21 +14,30 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
 
 /**
- * @author Poonkodi
- *
+ * @author Poonkodi Ponnambalam
+ * Student id - 611
+ * Course - CS218 cloud computing
+ * Program - Page rank computation using Map -reduce approach
+ * 		   - Mapper and reducer classes for page rank computation
  */
+
 public class PageRank {
 	static String kSeparator = "<>";
 
+	/**
+	 * This is the mapper class to implement page rank
+	 * Input : Text format. Each line contains <pagescore> <URl> <outlink1> <outlink2> etc
+	 * Output: <Outlink>:<pagescore> 
+	 *
+	 */
 	public static class PageRankMapper extends Mapper<LongWritable , Text,  Text, Text> {
-
 		public void map(LongWritable key, Text values, Context context) 
 				throws IOException, InterruptedException {
 
-			 String[] result = values.toString().split("\t");
-			 for (int x=0; x < result.length ; x++)
-			      System.out.println(result[x]);
-			
+			String[] result = values.toString().split("\t");
+			for (int x=0; x < result.length ; x++)
+				System.out.println(result[x]);
+
 			if (result.length < 2) {
 				return;
 			}
@@ -56,6 +64,12 @@ public class PageRank {
 	}
 
 
+	/**
+	 * This is the reducer class to implement page rank
+	 * Input : Output of the mapper. Each URL gets multiple pagescores from different inlinks
+	 * Output: same format as the input of the mapper 
+	 *
+	 */
 	public static class PageRankReducer extends Reducer<Text, Text, Text, Text> 
 	{
 		public void reduce(Text key, Iterable<Text> value, Context context) 
@@ -66,13 +80,13 @@ public class PageRank {
 			Iterator<Text> val_iter = value.iterator();
 			while (val_iter.hasNext()) {
 				String v = val_iter.next().toString();		
-				
+
 				System.out.println("ReducerInput: k:" + key + "  ; v :" + v);
-				 String[] result = v.split(kSeparator);
-				 for (int x=0; x < result.length ; x++) {
-				      System.out.println("Reducer Args : " + result[x]);
-				 }
-							
+				String[] result = v.split(kSeparator);
+				for (int x=0; x < result.length ; x++) {
+					System.out.println("Reducer Args : " + result[x]);
+				}
+
 				if (result.length != 2) continue;
 
 				System.out.println("tag:" + result[0]);
@@ -89,11 +103,14 @@ public class PageRank {
 				link_str = key.toString();
 			}
 			System.out.println("ReducerOutput: k:"+ out_key + " ; v:" + link_str);
-			
+
 			context.write(new Text(out_key) , new Text(link_str));
 		}
 	}
 
+	/**
+	 * Runs one iteration of page rank computation
+	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static void RunPageRankIteration(Configuration conf, String run_label, 
 			String input_path, String output_path) throws Exception {
@@ -103,20 +120,25 @@ public class PageRank {
 		job.setMapperClass((Class)PageRankMapper.class);
 
 		job.setReducerClass((Class)PageRankReducer.class);
-		
+
 		job.setOutputKeyClass((Class)Text.class);
 		job.setOutputValueClass((Class)Text.class);
-				
-	    job.setInputFormatClass((Class)TextInputFormat.class);
-	    job.setOutputFormatClass((Class)TextOutputFormat.class);
-		
+
+		job.setInputFormatClass((Class)TextInputFormat.class);
+		job.setOutputFormatClass((Class)TextOutputFormat.class);
+
 		FileInputFormat.setInputPaths((Job)job, (Path)new Path(input_path));
-	    FileOutputFormat.setOutputPath((Job)job, (Path)new Path(output_path));
-	    
-	    job.waitForCompletion(true);
-	    
-	    System.out.println("Completing PR iteration  : " + run_label);
+		FileOutputFormat.setOutputPath((Job)job, (Path)new Path(output_path));
+
+		job.waitForCompletion(true);
+
+		System.out.println("Completing PR iteration  : " + run_label);
 	}
+
+	/**
+	 * Gets the input path ,output path and no of iterations from the user
+	 * Mapper and the reducer is done for the those no of iterations
+	 */
 
 	public static void main(String[] args) throws Exception {
 		Configuration conf = new Configuration();
@@ -125,19 +147,14 @@ public class PageRank {
 			System.err.println("Usage: PageRank input_path output_prefix num_iterations");
 			System.exit(2);
 		}
-		
 		String input_path = otherArgs[0];
 		String output_prefix = otherArgs[1] ;
 		int num_iters = Integer.parseInt(otherArgs[2]);
-		
 		for (int i = 0; i < num_iters; i++) {
 			String out_path = output_prefix + "iter_" + i;
 			RunPageRankIteration(conf, "PR_iter_" + i, input_path, out_path);
 			input_path = out_path + "/";
-			
 		}
-		
 		System.exit(0);
 	}
-	
 }
