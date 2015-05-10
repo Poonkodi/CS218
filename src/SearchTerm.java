@@ -8,25 +8,27 @@ import java.util.Scanner;
 import java.util.TreeMap;
 import org.tartarus.snowball.ext.englishStemmer;
 
-
-/*
- * The program loads the inverted index for all the tokens and page rank of the URLS in memory.
+/**
+ * @author Poonkodi Ponnambalam
+ * The program loads the inverted index for all the tokens and
+ *  page rank of the URLS in memory.
  * On top of this search is performed
- * 
  */
 public class SearchTerm {
 	// Contains URL as key and pagerank as value
 	Map<String, Double> pagerank_map;
 	// Contains term as key and top n urls as value
 	Map<String, ArrayList<String>> document_index;
-
 	SearchTerm() {
 		document_index = new HashMap<String, ArrayList<String>>();
 		pagerank_map = new HashMap<String, Double>();
 	}
 
-	// Read file from pagerank.
-	// And load it to the pagerank_map.
+	/**
+	 * Read file from pagerank.
+	 * And load it to the pagerank_map.
+	 * @throws FileNotFoundException
+	 */
 	public void loadPageRank() throws FileNotFoundException {
 		String pageRankFile="/Users/vinodh/abitha/Spring2015/cloud-comp/PRoutput";
 		Scanner scanner = new Scanner(new File(pageRankFile));
@@ -39,12 +41,10 @@ public class SearchTerm {
 		}
 	} 
 
-
-	/*
+	/**
 	 * Looks up pagerank for all urls. And sorts by decreasing order of
 	 * pagerank. If PR not found, assigns zero pagerank.
-	 * 
-	 * <1, url1>, <2, url2> , <1, url3>, <1, url4>
+	 * <1, url1>, <2, url2>, <1, url3>, <1, url4>
 	 */
 	public ArrayList<String> sortDocsByPageRank(ArrayList<String> input_docs) {
 		Map<Double, ArrayList<String>> doc_map = new TreeMap<Double, ArrayList<String>>();
@@ -66,8 +66,9 @@ public class SearchTerm {
 		return output_sorted_urls;
 	}
 
-	/*
+	/**
 	 * Reads the index and loads it to memory.
+	 * @throws FileNotFoundException
 	 */
 	public void loadIndex() throws FileNotFoundException {
 		TreeMap<String, Integer> tmap = null;
@@ -96,15 +97,16 @@ public class SearchTerm {
 	}
 
 
+	/**
+	 * Main file.
+	 */
 	public static void main(String[] args) throws FileNotFoundException {
-
 		SearchTerm index = new SearchTerm();
 		index.loadPageRank();
 		index.loadIndex();
 		List<String> result_urls;
 		Scanner in = new Scanner(System.in);
 		while (true) {
-
 			System.out.println("Enter query > ");
 			String query = in.nextLine().trim().toLowerCase();
 			englishStemmer stemmer = new englishStemmer();
@@ -117,21 +119,31 @@ public class SearchTerm {
 		}
 	}
 
+	/**
+	 * Displays results of the retreived documents.
+	 * @param query
+	 * @param result_urls
+	 */
 	private void displayResults(String query, List<String> result_urls) {
-		// TODO Auto-generated method stub
 		System.out.println("Search results for " + query);
 		if (result_urls == null || result_urls.size() == 0) {
 			System.out.println("No results found.");
 			return;
 		}
 		for (String url : result_urls)
-			System.out.println("http://en.wikipedia.org/wiki/" + url);
+		{
+			String doc=url.replaceAll(" ", "_");
+			System.out.println("http://simple.wikipedia.org/wiki/" + doc);
+		}
 		System.out.println("\n");
 	}
 
-	//Fetch the URLs from document index
+	/**
+	 * Fetch the URLs from document index
+	 * @param raw_query
+	 * @return the list of URLS for the query
+	 */
 	private List<String> searchIndex(String raw_query) {
-		// process query. Do stemming here if needed.
 		String processed_query = raw_query;
 		// list of strings
 		if (document_index.containsKey(processed_query)) {
